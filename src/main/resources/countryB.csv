@@ -1,13 +1,5 @@
 iso2c,iso3c,country,year,life_expect,population,birth_rate,neonat_mortal_rate,region,income
 AD,AND,Andorra,1994,,62707,10.9,3.2,Europe & Central Asia,High income
-AD,AND,Andorra,1995,,63854,11,3,Europe & Central Asia,High income
-AD,AND,Andorra,2006,,83373,10.6,1.9,Europe & Central Asia,High income
-AD,AND,Andorra,2007,,84878,10.1,1.8,Europe & Central Asia,High income
-AD,AND,Andorra,1996,,64291,10.9,2.8,Europe & Central Asia,High income
-AD,AND,Andorra,1993,,61003,11.4,3.4,Europe & Central Asia,High income
-BS,BHS,"Bahamas, The",1996,71.39043902,283792,21.345,10.2,Latin America & Caribbean,High income
 BS,BHS,"Bahamas, The",2.00E+03,72.25429268,297891,17.619,8.7,Latin America & Caribbean,High income
 SS,SSD,South Sudan,1999,48.80629268,6398416,43.693,58.8,Sub-Saharan Africa,Not classified
-SS,SSD,South Sudan,1991,44.22592683,5698998,47.191,66.1,Sub-Saharan Africa,Not classified
-SS,SSD,South Sudan,1990,43.5187561,5762190,47.463,66.7,Sub-Saharan Africa,Not classified
-SS,SSD,"Bahamas, The",2.00E+03,72.25429268,297891,17.619,8.7,Latin America & Caribbean,High income
+KR,KOR,"Korea, Rep.",1992,72.2004878,43747962,16.7,2.4,East Asia & Pacific,High income

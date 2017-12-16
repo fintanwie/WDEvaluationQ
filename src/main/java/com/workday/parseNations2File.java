@@ -1,24 +1,14 @@
 package com.workday;
 
-import com.sun.tools.corba.se.idl.constExpr.Not;
-import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
-import com.sun.tools.javac.comp.Lower;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -26,7 +16,7 @@ import java.util.TreeSet;
 /**
  * Created by fward on 12/12/2017.
  */
-public class readCSVFileExample
+public class parseNations2File
 {
     private static final char DEFAULT_SEPARATOR = ',';
     private static final char DEFAULT_QUOTE = '"';
@@ -35,8 +25,8 @@ public class readCSVFileExample
     public static void main(String[] args)
     {
         try {
-            readCSVFileExample reader = new readCSVFileExample();
-            reader.readCSVFile3("countryB.csv", fileHeaders);
+            parseNations2File reader = new parseNations2File();
+            reader.readCSVFile3("nations2a.csv", fileHeaders);
         } catch (Exception ex) {
             System.out.println("Error reading the file.");
         }
@@ -49,7 +39,7 @@ public class readCSVFileExample
         //System.out.println("\nSTART PARSING DATA.");
         List<Map<String, String>> parsedData = parseInputData(fileHeaders, fileData);
         //System.out.println("\nEND PARSING DATA.");
-        printParsedData(parsedData);
+        printParsedData(fileHeaders, parsedData);
         return parsedData;
     }
 
@@ -60,6 +50,8 @@ public class readCSVFileExample
         Map<String, String> aRecord = new TreeMap<>();
         Set<String> headers = new TreeSet<>();
         headers.addAll(allHeaders);
+        ArrayList<String> incomeValues = new ArrayList<String>(Arrays.asList("High income", "Low income",
+                "Upper middle income","Lower middle income","Not classified"));
 
         int dataPointPosition = -1;
         String partialDataPoint = "";
@@ -126,26 +118,42 @@ public class readCSVFileExample
                 if(debug) System.out.println("Add to Map : [" + fieldName + "] = [" + dataPointFound + "].");
                 //if (headerNumber == 0) {
                 if(debug) System.out.println("parseInputData 4a : " + headerNumber + " == " + allHeaders.size());
-                //if (headerNumber == allHeaders.size()) {
                 if (checkForLastHeader(allHeaders, dataPointPosition)) {
                     // Store record and start a new one
-                    aRecord.put(fieldName, dataPointFound);
+
                     if(debug) System.out.println("parseInputData 5a: Found last header");
                     if(debug) System.out.println("parseInputData 5a: dataPointFound [" + dataPointFound + "].");
                     if(debug) System.out.println("parseInputData 5b : " + aRecord.size() + " == " + allHeaders.size());
+
+                    String firstFieldOfNextRecord = "";
+                    for (String incomeValue : incomeValues) {
+                        if (dataPointFound.contains(incomeValue)) {
+                            firstFieldOfNextRecord = dataPointFound.replace(incomeValue, "");
+                            dataPointFound = incomeValue;
+                            if(debug) System.out.println("parseInputData 5c: firstFieldOfNextRecord : " + firstFieldOfNextRecord);
+                            if(debug) System.out.println("parseInputData 5d: dataPointFound : " + dataPointFound);
+                        }
+                    }
+                    if(debug) System.out.println("parseInputData 5c2 : Adding : " + fieldName + " , " + dataPointFound);
+                    aRecord.put(fieldName, dataPointFound);
+
+                    if(debug) System.out.println("parseInputData 5e: " + aRecord.size() + " == " + allHeaders.size());
                     if (aRecord.size() == allHeaders.size()) {
-                        if(debug) System.out.println("parseInputData 5c: Storing Record : [" + aRecord + "].");
+                        if(debug) System.out.println("parseInputData 5f: Storing Record : [" + aRecord + "].");
                         parsedData.add(aRecord);
                     }
                     if(debug) System.out.println("parseInputData 6: Clearing record.");
                     aRecord = new LinkedHashMap<>();
-                    aRecord.put(fieldName, dataPointFound);
+                    if (firstFieldOfNextRecord.length() > 0) {
+                        if(debug) System.out.println("parseInputData 6a: Adding Field [" + allHeaders.get(allHeaders.size()-1) +
+                                " ]: [" + firstFieldOfNextRecord + "].");
+                        aRecord.put(allHeaders.get(0), firstFieldOfNextRecord);
+                        dataPointPosition++;
+                        continue;
+                    }
                 }
-                else {
-                    // Add to existing record.
-                    if(debug) System.out.println("parseInputData 7: Adding Field.");
-                    aRecord.put(fieldName, dataPointFound);
-                }
+                if(debug) System.out.println("parseInputData 8: Adding Field [" + fieldName + "] : [" +
+                        dataPointFound + "].");
                 aRecord.put(fieldName, dataPointFound);
             }
         }
@@ -154,13 +162,23 @@ public class readCSVFileExample
         return parsedData;
     }
 
-    public void printParsedData(List<Map<String, String>> parsedData) {
+    public void printParsedData(List<String> allHeaders, List<Map<String, String>> parsedData) {
+        System.out.print("Headers   : ");
+        for (String field : allHeaders) {
+            String text = "[" + field + "], ";
+            for (int j = field.length(); j < 26; j++) {
+                text += " ";
+            }
+            System.out.print(text);
+        }
+
         int i=0;
         for (Map<String, String> record : parsedData) {
-            System.out.print("\nRecord " + ++i + ": ");
-            for (String field : record.keySet()) {
-                String text = "[" + record.get(field) + "], ";
-                for (int j = record.get(field).length(); j < 14; j++) {
+            System.out.print(String.format("\nRecord %02d : ", ++i));
+            for (String field : allHeaders) {
+                String fieldValue = record.get(field);
+                String text = "[" + fieldValue + "], ";
+                for (int j = fieldValue.length(); j < 26; j++) {
                     text += " ";
                 }
                 System.out.print(text);
@@ -175,6 +193,7 @@ public class readCSVFileExample
 
     public boolean checkForLastHeader(List<String> allHeaders, int dataPointPosition) {
         boolean debug = false;
+        if (debug) System.out.println("checkForLastHeader.");
         int currentPosition = dataPointPosition % allHeaders.size();
         if (currentPosition == allHeaders.size()-1) {
             if (debug) System.out.println("checkForLastHeader 1: At Last Header");
@@ -252,24 +271,10 @@ public class readCSVFileExample
         return charArray;
     }
 
-    public void printArrayList(List<String> wordList) {
-        System.out.println("Printing ArrayList : ");
-        for (String word : wordList)
-            System.out.println("Word is : " + word);
-    }
-
     public void printCharArray(char[] array) {
         for(int i=0; i < array.length; i++) {
             array[i] = array[i];
             System.out.print(array[i]);
-        }System.out.print("].\n");
-    }
-
-    public void printObjectArray(Object[] array) {
-        for(int i=0; i < array.length; i++) {
-            array[i] = array[i];
-            System.out.print(array[i]);
-            if (i+1 < array.length) System.out.print(", ");
         }System.out.print("].\n");
     }
 
@@ -288,43 +293,6 @@ public class readCSVFileExample
         return compactArray;
     }
 
-    public void processData(StringBuilder parsedData, List<String> lineRemaining) {
-        System.out.println("Processing Line : [" + lineRemaining + "].");
-        for (String word : lineRemaining) {
-            System.out.println("processData : Adding Line : [" + word.trim() + "].");
-            parsedData.append(word.trim());
-        }
-    }
-    public List<String> handleHeaders(List<String> line, Set<String> headers) {
-        System.out.println("handleHeaders : line is ["  + line + "]");
-        List<String> lineRemaining = new ArrayList<>();
-        List<String> headersFound = new ArrayList<>();
-
-        for (String header : headers) {
-            for (String word : line) {
-                if (word.indexOf(header) >= 0) {
-                    System.out.println("Header found : " + word);
-                    headersFound.add(header);
-
-                    String wordRemaining = getRemainingWord(header, word);
-                    System.out.println("handleHeaders wordRemaining : [" + wordRemaining + "].");
-                    if (wordRemaining.length() > 0) {
-                        System.out.println("handleHeaders 1. wordRemaining.add( : " + wordRemaining + ");");
-                        lineRemaining.add(wordRemaining);
-                    }
-                }
-            }
-        }
-        headers.removeAll(headersFound);
-
-        if (headers.isEmpty())
-            System.out.println("All Headers Found");
-        else
-            System.out.println("Headers left : " + headers.toString());
-        System.out.println("handleHeaders : XXX lineRemaining [" + lineRemaining + "]");
-        return lineRemaining;
-    }
-
     public String doesDatapointContainHeader(Set<String> headers, String word) {
         boolean debug = false;
         String containsHeader = "";
@@ -334,21 +302,6 @@ public class readCSVFileExample
                 containsHeader = header;
             }
         return containsHeader;
-    }
-
-    public boolean isHeader(Set<String> headers, String word) {
-        boolean debug = false;
-        boolean isHeader = false;
-        for (String header : headers)
-            if (word.equalsIgnoreCase(header)) {
-                if (debug) System.out.println("isHeader 1. : This is a header");
-                isHeader = true;
-            }
-        return isHeader;
-    }
-
-    public String getRemainingWord(String header, String word) {
-        return word.replace(header, "").trim();
     }
 
     public StringBuilder parseCharArray(char[] charArray) {
@@ -370,6 +323,7 @@ public class readCSVFileExample
         boolean doubleQuotesInColumn = false;
 
         int charCount = -1;
+        int fieldNumber = 0;
         if (debug) System.out.println("==>> parseCharArray.length : " + charArray.length);
         if (debug) System.out.println("==>> Test Char [" + (charArray.length-1) + "] : " + charArray[charArray.length-1]);
         for (char ch : charArray) {
@@ -407,6 +361,7 @@ public class readCSVFileExample
                 if (ch == '\r') {
                     if (debug) System.out.println("In LF");
                     //ignore LF characters
+                    curVal.append(",");
                     continue;
                 } else if (ch == '\n') {
                     if (debug) System.out.println("parseCharArray inQuotes: In CF");
@@ -418,11 +373,8 @@ public class readCSVFileExample
                 if (ch == customQuote) {
                     inQuotes = true;
                     inWord = true;
-                    //Fixed : allow "" in empty quote enclosed
-                    //if (charArray[0] != '"' && customQuote == '\"') {
-                        curVal.append('"');
-                    //}
 
+                    curVal.append('"');
                     //double quotes in column will hit this!
                     if (startCollectChar) {
                         curVal.append('"');
@@ -430,8 +382,8 @@ public class readCSVFileExample
 
                 } else if (ch == separator) {
                     if (debug) System.out.println("parseCharArray : In Seperator curValue is : [" + curVal + "].");
+                    fieldNumber++;
                     inWord = false;
-                    //result.add(curVal.toString());
                     result.append(curVal.toString()).append(separator);
 
                     curVal = new StringBuffer();
@@ -441,13 +393,16 @@ public class readCSVFileExample
                     if (debug) System.out.println("parseCharArray : curValue is now : [" + curVal + "].");
 
                 } else if (ch == '\r') {
-                    if (debug) System.out.println("In LF");
-                    //ignore LF characters
+                    // catch LF characters
+                    if (debug) System.out.println("parseCharArray : In LF");
+
+                    curVal.append(',');
+                    if (debug) System.out.println("parseCharArray : Adding seperator.");
                     continue;
                 } else if (ch == '\n') {
+                    // ignore CF characters
                     if (debug) System.out.println("parseCharArray : In CF");
-                    curVal.append(",");
-                    if (debug) System.out.println("parseCharArray X: parseLine : " + curVal);
+                    //if (debug) System.out.println("parseCharArray X: parseLine : " + curVal);
                     continue;
                 } else {
                     inWord = true;
@@ -460,10 +415,8 @@ public class readCSVFileExample
 
         if (!inWord) {
             if (debug) System.out.println("Adding Word : " + curVal);
-            //result.add(curVal.toString() + "|");
             result.append(curVal.toString());
         } else {
-            //result.add(curVal.toString());
             result.append(curVal.toString());
             if (debug) System.out.println("Last Word is : " + curVal);
             if (debug) System.out.println("Last result is : " + result);
