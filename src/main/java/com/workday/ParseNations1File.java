@@ -16,20 +16,43 @@ import java.util.TreeSet;
 /**
  * Created by fward on 12/12/2017.
  */
-public class parseNations1File
+public class ParseNations1File
 {
     private static final char DEFAULT_SEPARATOR = ',';
     private static final char DEFAULT_QUOTE = '"';
-    protected static final List<String> fileHeaders = new ArrayList<>(Arrays.asList(new String[] {"number", "countryCode" , "countryName"}));
 
-    public static void main(String[] args)
-    {
+    public ArrayList<NationsRecord> getData() {
+        boolean debug = false;
+        List<Map<String, String>> parsedData = new ArrayList<>();
         try {
-            parseNations1File reader = new parseNations1File();
-            reader.readCSVFile3("countryB.csv", fileHeaders);
+            List<String> fileHeaders = new ArrayList<>();
+            fileHeaders.add("iso2c");
+            fileHeaders.add("iso3c");
+            fileHeaders.add("country");
+            fileHeaders.add("year");
+            fileHeaders.add("life_expect");
+            fileHeaders.add("population");
+            fileHeaders.add("birth_rate");
+            fileHeaders.add("neonat_mortal_rate");
+            fileHeaders.add("region");
+            fileHeaders.add("income");
+            if(debug) System.out.println("fileHeaders :" + fileHeaders);
+            parsedData =  readCSVFile3("nations1.csv", fileHeaders);
         } catch (Exception ex) {
-            System.out.println("Error reading the file.");
+            if(debug) System.out.println("Error reading the file.");
         }
+
+        // Create national records
+        ArrayList<NationsRecord> national1Data  = new ArrayList<>();
+        for (Map<String, String> record : parsedData) {
+            if(debug) System.out.println("ParseNations1File : getData : " + record.toString());
+            if (record.get("year").equals("2014")) {
+                if(debug) System.out.println("ParseNations1File : getData : Creating Record.");
+                national1Data.add(new NationsRecord(record));
+            }
+        }
+        if(debug) System.out.println("nationalData : "  + national1Data);
+        return national1Data;
     }
 
     public List<Map<String, String>> readCSVFile3(String fileName, List<String> fileHeaders) throws Exception {
@@ -39,7 +62,7 @@ public class parseNations1File
         //System.out.println("\nSTART PARSING DATA.");
         List<Map<String, String>> parsedData = parseInputData(fileHeaders, fileData);
         //System.out.println("\nEND PARSING DATA.");
-        printParsedData(fileHeaders, parsedData);
+        //printParsedData(fileHeaders, parsedData);
         return parsedData;
     }
 
@@ -308,42 +331,43 @@ public class parseNations1File
         return compactArray;
     }
 
-    public void processData(StringBuilder parsedData, List<String> lineRemaining) {
-        System.out.println("Processing Line : [" + lineRemaining + "].");
-        for (String word : lineRemaining) {
-            System.out.println("processData : Adding Line : [" + word.trim() + "].");
-            parsedData.append(word.trim());
-        }
-    }
-    public List<String> handleHeaders(List<String> line, Set<String> headers) {
-        System.out.println("handleHeaders : line is ["  + line + "]");
-        List<String> lineRemaining = new ArrayList<>();
-        List<String> headersFound = new ArrayList<>();
+//    public void processData(StringBuilder parsedData, List<String> lineRemaining) {
+//        System.out.println("Processing Line : [" + lineRemaining + "].");
+//        for (String word : lineRemaining) {
+//            System.out.println("processData : Adding Line : [" + word.trim() + "].");
+//            parsedData.append(word.trim());
+//        }
+//    }
 
-        for (String header : headers) {
-            for (String word : line) {
-                if (word.indexOf(header) >= 0) {
-                    System.out.println("Header found : " + word);
-                    headersFound.add(header);
-
-                    String wordRemaining = getRemainingWord(header, word);
-                    System.out.println("handleHeaders wordRemaining : [" + wordRemaining + "].");
-                    if (wordRemaining.length() > 0) {
-                        System.out.println("handleHeaders 1. wordRemaining.add( : " + wordRemaining + ");");
-                        lineRemaining.add(wordRemaining);
-                    }
-                }
-            }
-        }
-        headers.removeAll(headersFound);
-
-        if (headers.isEmpty())
-            System.out.println("All Headers Found");
-        else
-            System.out.println("Headers left : " + headers.toString());
-        System.out.println("handleHeaders : XXX lineRemaining [" + lineRemaining + "]");
-        return lineRemaining;
-    }
+//    public List<String> handleHeaders(List<String> line, Set<String> headers) {
+//        System.out.println("handleHeaders : line is ["  + line + "]");
+//        List<String> lineRemaining = new ArrayList<>();
+//        List<String> headersFound = new ArrayList<>();
+//
+//        for (String header : headers) {
+//            for (String word : line) {
+//                if (word.indexOf(header) >= 0) {
+//                    System.out.println("Header found : " + word);
+//                    headersFound.add(header);
+//
+//                    String wordRemaining = getRemainingWord(header, word);
+//                    System.out.println("handleHeaders wordRemaining : [" + wordRemaining + "].");
+//                    if (wordRemaining.length() > 0) {
+//                        System.out.println("handleHeaders 1. wordRemaining.add( : " + wordRemaining + ");");
+//                        lineRemaining.add(wordRemaining);
+//                    }
+//                }
+//            }
+//        }
+//        headers.removeAll(headersFound);
+//
+//        if (headers.isEmpty())
+//            System.out.println("All Headers Found");
+//        else
+//            System.out.println("Headers left : " + headers.toString());
+//        System.out.println("handleHeaders : XXX lineRemaining [" + lineRemaining + "]");
+//        return lineRemaining;
+//    }
 
     public String doesDatapointContainHeader(Set<String> headers, String word) {
         boolean debug = false;
@@ -354,21 +378,6 @@ public class parseNations1File
                 containsHeader = header;
             }
         return containsHeader;
-    }
-
-    public boolean isHeader(Set<String> headers, String word) {
-        boolean debug = false;
-        boolean isHeader = false;
-        for (String header : headers)
-            if (word.equalsIgnoreCase(header)) {
-                if (debug) System.out.println("isHeader 1. : This is a header");
-                isHeader = true;
-            }
-        return isHeader;
-    }
-
-    public String getRemainingWord(String header, String word) {
-        return word.replace(header, "").trim();
     }
 
     public StringBuilder parseCharArray(char[] charArray) {
@@ -438,10 +447,7 @@ public class parseNations1File
                 if (ch == customQuote) {
                     inQuotes = true;
                     inWord = true;
-                    //Fixed : allow "" in empty quote enclosed
-                    //if (charArray[0] != '"' && customQuote == '\"') {
-                        curVal.append('"');
-                    //}
+                    curVal.append('"');
 
                     //double quotes in column will hit this!
                     if (startCollectChar) {
@@ -451,7 +457,6 @@ public class parseNations1File
                 } else if (ch == separator) {
                     if (debug) System.out.println("parseCharArray : In Seperator curValue is : [" + curVal + "].");
                     inWord = false;
-                    //result.add(curVal.toString());
                     result.append(curVal.toString()).append(separator);
 
                     curVal = new StringBuffer();
@@ -480,10 +485,8 @@ public class parseNations1File
 
         if (!inWord) {
             if (debug) System.out.println("Adding Word : " + curVal);
-            //result.add(curVal.toString() + "|");
             result.append(curVal.toString());
         } else {
-            //result.add(curVal.toString());
             result.append(curVal.toString());
             if (debug) System.out.println("Last Word is : " + curVal);
             if (debug) System.out.println("Last result is : " + result);

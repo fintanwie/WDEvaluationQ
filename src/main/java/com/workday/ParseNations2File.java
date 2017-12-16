@@ -16,30 +16,61 @@ import java.util.TreeSet;
 /**
  * Created by fward on 12/12/2017.
  */
-public class parseNations2File
+public class ParseNations2File
 {
     private static final char DEFAULT_SEPARATOR = ',';
     private static final char DEFAULT_QUOTE = '"';
-    protected static final List<String> fileHeaders = new ArrayList<>(Arrays.asList(new String[] {"number", "countryCode" , "countryName"}));
 
-    public static void main(String[] args)
-    {
+    public void getData(ArrayList<NationsRecord> nationalData) {
+        boolean debug = false;
+        List<Map<String, String>> parsedData = new ArrayList<>();
         try {
-            parseNations2File reader = new parseNations2File();
-            reader.readCSVFile3("nations2a.csv", fileHeaders);
+            List<String> fileHeaders = new ArrayList<>();
+            fileHeaders.add("iso3c");
+            fileHeaders.add("year");
+            fileHeaders.add("gdp_percap");
+            if(debug) System.out.println("fileHeaders :" + fileHeaders);
+            parsedData =  readCSVFile3("nations2.csv", fileHeaders);
         } catch (Exception ex) {
-            System.out.println("Error reading the file.");
+            if(debug) System.out.println("Error reading the file.");
         }
+
+        // Create national records
+        boolean testRun = false;
+        for (Map<String, String> record : parsedData) {
+            if(debug) System.out.println("ParseNations2File : getData : " + record.toString());
+            if (record.get("year").equals("2014")) {
+                if(debug) System.out.println("ParseNations2File : Year 2014 Found.");
+                if (nationalData.size() > 0 && !testRun) {
+                    for (NationsRecord nr : nationalData) {
+                        String currentIso3c  = record.get("iso3c");
+                        String storedIso3c = nr.getIso3c();
+                        if (currentIso3c.equalsIgnoreCase(storedIso3c)) {
+                            if(debug) System.out.println("ParseNationsFile : addingData : [" + currentIso3c + "].");
+                            nr.setGdp_percap(record.get("gdp_percap"));
+                        }
+                    }
+                }
+                else {
+                    if(debug) System.out.println("ParseNations2File : Test Run : Adding Record.");
+                    NationsRecord nr = new NationsRecord(record);
+                    nationalData.add(nr);
+                    testRun = true;
+                }
+            }
+        }
+        if(debug) System.out.println("nationalData : "  + nationalData);
     }
 
     public List<Map<String, String>> readCSVFile3(String fileName, List<String> fileHeaders) throws Exception {
+        boolean debug = false;
         StringBuilder fileData = new StringBuilder();
         fileData.append(parseDataFile(fileName));
 
-        //System.out.println("\nSTART PARSING DATA.");
+        if(debug) System.out.println("\nSTART PARSING DATA.");
         List<Map<String, String>> parsedData = parseInputData(fileHeaders, fileData);
-        //System.out.println("\nEND PARSING DATA.");
-        printParsedData(fileHeaders, parsedData);
+        if(debug) System.out.println("\nEND PARSING DATA.");
+        if(debug) printParsedData(fileHeaders, parsedData);
         return parsedData;
     }
 

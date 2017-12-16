@@ -54,7 +54,7 @@ public class readCSVFileTest
         expected.add(record4);
         expected.add(record5);
 
-        parseNations1File reader = new parseNations1File();
+        ParseNations1File reader = new ParseNations1File();
         List<Map<String, String>> results = reader.readCSVFile3("country.csv", fileHeaders);
         Assert.assertEquals(expected, results);
     }
@@ -75,7 +75,7 @@ public class readCSVFileTest
         fileHeaders.add("income");
         System.out.println("fileHeaders :" + fileHeaders);
 
-        parseNations1File reader = new parseNations1File();
+        ParseNations1File reader = new ParseNations1File();
         List<Map<String, String>> results = reader.readCSVFile3("countryB.csv", fileHeaders);
         Assert.assertEquals(4, results.size());
     }
@@ -96,7 +96,7 @@ public class readCSVFileTest
         fileHeaders.add("income");
         System.out.println("fileHeaders :" + fileHeaders);
 
-        parseNations1File reader = new parseNations1File();
+        ParseNations1File reader = new ParseNations1File();
         List<Map<String, String>> results = reader.readCSVFile3("nations1a.csv", fileHeaders);
         Assert.assertEquals(100, results.size());
     }
@@ -117,9 +117,19 @@ public class readCSVFileTest
         fileHeaders.add("income");
         System.out.println("fileHeaders :" + fileHeaders);
 
-        parseNations1File reader = new parseNations1File();
+        ParseNations1File reader = new ParseNations1File();
         List<Map<String, String>> results = reader.readCSVFile3("nations1.csv", fileHeaders);
         Assert.assertEquals(5486, results.size());
+    }
+
+
+    @Test
+    public void testNations1GetData() throws Exception
+    {
+        ParseNations1File nations1Parser = new ParseNations1File();
+        ArrayList<NationsRecord> nationalData = nations1Parser.getData();
+
+        Assert.assertEquals(211, nationalData.size());
     }
 
     @Test
@@ -131,7 +141,7 @@ public class readCSVFileTest
         fileHeaders.add("gdp_percap");
         System.out.println("fileHeaders :" + fileHeaders);
 
-        parseNations2File reader = new parseNations2File();
+        ParseNations2File reader = new ParseNations2File();
         List<Map<String, String>> results = reader.readCSVFile3("nations2a.csv", fileHeaders);
         Assert.assertEquals(18, results.size());
     }
@@ -145,8 +155,18 @@ public class readCSVFileTest
         fileHeaders.add("gdp_percap");
         System.out.println("fileHeaders :" + fileHeaders);
 
-        parseNations2File reader = new parseNations2File();
+        ParseNations2File reader = new ParseNations2File();
         List<Map<String, String>> results = reader.readCSVFile3("nations2.csv", fileHeaders);
         Assert.assertEquals(5486, results.size());
+    }
+
+    @Test
+    public void testNations2GetData() throws Exception
+    {
+        ParseNations2File nations2Parser = new ParseNations2File();
+        ArrayList<NationsRecord> nationalData = new ArrayList<>();
+        nations2Parser.getData(nationalData);
+
+        Assert.assertEquals(211, nationalData.size());
     }
 }
