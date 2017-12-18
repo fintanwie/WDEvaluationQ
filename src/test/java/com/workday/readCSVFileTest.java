@@ -127,7 +127,8 @@ public class readCSVFileTest
     public void testNations1GetData() throws Exception
     {
         ParseNations1File nations1Parser = new ParseNations1File();
-        ArrayList<NationsRecord> nationalData = nations1Parser.getData();
+        ArrayList<NationsRecord> nationalData = new ArrayList<NationsRecord>();
+        nations1Parser.getData(nationalData);
 
         Assert.assertEquals(211, nationalData.size());
     }

@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class DataScienceExcerise
 {
     private Scanner scanner = new Scanner(System.in);
-    private ArrayList<NationsRecord> nationalData;
+    private List<NationsRecord> nationalData = new ArrayList<>();
 
     public static void main(String[] args)
     {
@@ -25,7 +25,7 @@ public class DataScienceExcerise
     private void getNationData()
     {
         ParseNations1File nations1Parser = new ParseNations1File();
-        nationalData = nations1Parser.getData();
+        nations1Parser.getData(nationalData);
 
         ParseNations2File nations2Parser = new ParseNations2File();
         nations2Parser.getData(nationalData);
@@ -48,8 +48,8 @@ public class DataScienceExcerise
                     printInstructions();
                     break;
                 case 1:
-                    Collections.sort(nationalData);
-                    printData(nationalData);
+                    Collections.sort((ArrayList)nationalData);
+                    printData((ArrayList)nationalData);
                     break;
                 case 2:
                     poppingMenu = displayOutliersMenu();
