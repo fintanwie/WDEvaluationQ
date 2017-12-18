@@ -48,17 +48,23 @@ public class DataScienceExcerise
                     printInstructions();
                     break;
                 case 1:
-                    Collections.sort((ArrayList)nationalData);
+                    Collections.sort(nationalData);
                     printData((ArrayList)nationalData);
+                    System.out.println("Press Enter To Continue");
+                    scanner.nextLine();
                     break;
                 case 2:
                     poppingMenu = displayOutliersMenu();
                     break;
                 case 3:
                     findLowerIncomes();
+                    System.out.println("Press Enter To Continue");
+                    scanner.nextLine();
                     break;
                 case 4:
                     findingMatchingRegion();
+                    System.out.println("Press Enter To Continue");
+                    scanner.nextLine();
                     break;
                 case 5:
                     quit = true;
@@ -67,8 +73,7 @@ public class DataScienceExcerise
 
             if (!quit) {
                 if (!poppingMenu) {
-                    System.out.println("Press Enter To Continue");
-                    scanner.nextLine();
+//                    scanner.nextLine();
                 }
             }
         }
@@ -102,12 +107,18 @@ public class DataScienceExcerise
                     break;
                 case 1:
                     displayPopulationOutlier();
+                    System.out.println("Press Enter To Continue");
+                    scanner.nextLine();
                     break;
                 case 2:
                     displayGDPOutlier();
+                    System.out.println("Press Enter To Continue");
+                    scanner.nextLine();
                     break;
                 case 3:
                     displayLifeExpectencyOutlier();
+                    System.out.println("Press Enter To Continue");
+                    scanner.nextLine();
                     break;
                 case 4:
                     quit = true;
@@ -115,8 +126,8 @@ public class DataScienceExcerise
             }
 
             if (!quit) {
-                System.out.println("Press Enter To Continue");
-                scanner.nextLine();
+//                System.out.println("Press Enter To Continue");
+//                scanner.nextLine();
             }
         }
         return true;
