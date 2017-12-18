@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class readCSVFileTest
+public class DataScienceTests
 {
     @Test
     public void testTrue()
@@ -55,7 +55,7 @@ public class readCSVFileTest
         expected.add(record5);
 
         ParseNations1File reader = new ParseNations1File();
-        List<Map<String, String>> results = reader.readCSVFile3("country.csv", fileHeaders);
+        List<Map<String, String>> results = reader.readCSVFile("country.csv", fileHeaders);
         Assert.assertEquals(expected, results);
     }
 
@@ -76,7 +76,7 @@ public class readCSVFileTest
         System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations1File reader = new ParseNations1File();
-        List<Map<String, String>> results = reader.readCSVFile3("countryB.csv", fileHeaders);
+        List<Map<String, String>> results = reader.readCSVFile("countryB.csv", fileHeaders);
         Assert.assertEquals(4, results.size());
     }
 
@@ -97,7 +97,7 @@ public class readCSVFileTest
         System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations1File reader = new ParseNations1File();
-        List<Map<String, String>> results = reader.readCSVFile3("nations1a.csv", fileHeaders);
+        List<Map<String, String>> results = reader.readCSVFile("nations1a.csv", fileHeaders);
         Assert.assertEquals(100, results.size());
     }
 
@@ -118,7 +118,7 @@ public class readCSVFileTest
         System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations1File reader = new ParseNations1File();
-        List<Map<String, String>> results = reader.readCSVFile3("nations1.csv", fileHeaders);
+        List<Map<String, String>> results = reader.readCSVFile("nations1.csv", fileHeaders);
         Assert.assertEquals(5486, results.size());
     }
 
@@ -143,7 +143,7 @@ public class readCSVFileTest
         System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations2File reader = new ParseNations2File();
-        List<Map<String, String>> results = reader.readCSVFile3("nations2a.csv", fileHeaders);
+        List<Map<String, String>> results = reader.readCSVFile("nations2a.csv", fileHeaders);
         Assert.assertEquals(18, results.size());
     }
 
@@ -157,15 +157,18 @@ public class readCSVFileTest
         System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations2File reader = new ParseNations2File();
-        List<Map<String, String>> results = reader.readCSVFile3("nations2.csv", fileHeaders);
+        List<Map<String, String>> results = reader.readCSVFile("nations2.csv", fileHeaders);
         Assert.assertEquals(5486, results.size());
     }
 
     @Test
     public void testNations2GetData() throws Exception
     {
+        ParseNations1File nations1Parser = new ParseNations1File();
+        ArrayList<NationsRecord> nationalData = new ArrayList<NationsRecord>();
+        nations1Parser.getData(nationalData);
+
         ParseNations2File nations2Parser = new ParseNations2File();
-        ArrayList<NationsRecord> nationalData = new ArrayList<>();
         nations2Parser.getData(nationalData);
 
         Assert.assertEquals(211, nationalData.size());

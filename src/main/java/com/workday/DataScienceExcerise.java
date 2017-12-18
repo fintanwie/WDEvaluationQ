@@ -134,22 +134,74 @@ public class DataScienceExcerise
     private void displayLifeExpectencyOutlier()
     {
         Collections.sort(nationalData, NationsRecord.getLifeExpectencyComparator());
-        displayOutliers(nationalData);
+
+        float size = nationalData.size();
+        float middle = size / 2;
+        float meanPosition = middle / 2;
+        float lowerMean = (0 + meanPosition);
+        float higherMean = (middle + meanPosition);
+
+        double Q1 = nationalData.get((int) lowerMean - 1).getLife_expect() +
+                nationalData.get((int) lowerMean + 1).getLife_expect() / 2;
+        double Q3 = nationalData.get((int) higherMean - 1).getLife_expect() +
+                nationalData.get((int) higherMean + 1).getLife_expect() / 2;
+
+        double innerQuartileRange = Q3 - Q1;
+        double HighOutliner = Q3 + (1.5 * innerQuartileRange);
+        double LowOutliner = Q1 - (1.5 * innerQuartileRange);
+
+        ArrayList<NationsRecord> LowOutliers = new ArrayList<>();
+        ArrayList<NationsRecord> HighOutliers = new ArrayList<>();
+        for (NationsRecord nr : nationalData) {
+            if (nr.getLife_expect() < LowOutliner)
+                LowOutliers.add(nr);
+            if (nr.getLife_expect() > HighOutliner)
+                HighOutliers.add(nr);
+        }
+        System.out.println(String.format("HighOutliers  : (%.2f) :" + HighOutliers.size(), HighOutliner));
+        if (HighOutliers.size() > 0) printData(HighOutliers);
+        System.out.println(String.format("LowOutliers  : (%.2f) :" + LowOutliers.size(), LowOutliner));
+        if (LowOutliers.size() > 0) printData(LowOutliers);
     }
 
     private void displayGDPOutlier()
     {
         Collections.sort(nationalData, NationsRecord.getGDPComparator());
-        displayOutliers(nationalData);
+
+        float size = nationalData.size();
+        float middle = size / 2;
+        float meanPosition = middle / 2;
+        float lowerMean = (0 + meanPosition);
+        float higherMean = (middle + meanPosition);
+
+        double Q1 = nationalData.get((int) lowerMean - 1).getGdp_percap() +
+                nationalData.get((int) lowerMean + 1).getGdp_percap() / 2;
+        double Q3 = nationalData.get((int) higherMean - 1).getGdp_percap() +
+                nationalData.get((int) higherMean + 1).getGdp_percap() / 2;
+
+        double innerQuartileRange = Q3 - Q1;
+        double HighOutliner = Q3 + (1.5 * innerQuartileRange);
+        double LowOutliner = Q1 - (1.5 * innerQuartileRange);
+
+        ArrayList<NationsRecord> LowOutliers = new ArrayList<>();
+        ArrayList<NationsRecord> HighOutliers = new ArrayList<>();
+        for (NationsRecord nr : nationalData) {
+            if (nr.getGdp_percap() < LowOutliner)
+                LowOutliers.add(nr);
+            if (nr.getGdp_percap() > HighOutliner)
+                HighOutliers.add(nr);
+        }
+        String.format("%.2f", 4.52135);
+        System.out.println(String.format("HighOutliers  : (%.2f) :" + HighOutliers.size(), HighOutliner));
+        if (HighOutliers.size() > 0) printData(HighOutliers);
+        System.out.println(String.format("LowOutliers  : (%.2f) :" + LowOutliers.size(), LowOutliner));
+        if (LowOutliers.size() > 0) printData(LowOutliers);
     }
 
     private void displayPopulationOutlier()
     {
         Collections.sort(nationalData, NationsRecord.getPopulationComparator());
-        displayOutliers(nationalData);
-    }
 
-    private void displayOutliers(List<NationsRecord> nationalData) {
         float size = nationalData.size();
         float middle = size / 2;
         float meanPosition = middle / 2;
@@ -173,9 +225,9 @@ public class DataScienceExcerise
             if (nr.getPopulation() > HighOutliner)
                 HighOutliers.add(nr);
         }
-        System.out.println("HighOutliers  : (" + HighOutliner + ") : " + HighOutliers.size());
+        System.out.println(String.format("HighOutliers  : (%.2f) :" + HighOutliers.size(), HighOutliner));
         if (HighOutliers.size() > 0) printData(HighOutliers);
-        System.out.println("LowOutliers  : (" + LowOutliner + ") : " + LowOutliers.size());
+        System.out.println(String.format("LowOutliers  : (%.2f) :" + LowOutliers.size(), LowOutliner));
         if (LowOutliers.size() > 0) printData(LowOutliers);
     }
 
@@ -226,7 +278,7 @@ public class DataScienceExcerise
         String region = "No Match Found";
         if (selectedNR != null)
             region = selectedNR.getRegion();
-        System.out.println("Region Detected : " + region);
+        System.out.println("Region  Detected : " + region);
         scanner.nextLine();
     }
 
@@ -278,22 +330,48 @@ public class DataScienceExcerise
         }
 
         // No matches found
-        if (nearMatchingNR.size() == 0)
+        if (nearMatchingNR.size() == 0) {
             return null;
+        }
 
-        // Narrow to closest match
+        // One match found
+        if (nearMatchingNR.size() == 1) {
+            return nearMatchingNR.get(0);
+        }
+
+        // Narrow match
         Double curDiff;
         Double matchedDiff = 100.0;
-        NationsRecord finalMatch = null;
+        ArrayList<NationsRecord> matchingLE = new ArrayList<>();
         for (NationsRecord nr : nearMatchingNR) {
             curDiff = Math.abs(unknownNR.getLife_expect() - nr.getLife_expect());
             if (matchedDiff > curDiff) {
                 matchedDiff = curDiff;
-                finalMatch = nr;
+                matchingLE.add(nr);
             }
         }
-        System.out.println();
-        return finalMatch;
+        if (matchingLE.size() == 0) {
+            return nearMatchingNR.get(0);
+        }
+        if (matchingLE.size() == 1) {
+            return matchingLE.get(0);
+        }
+
+        // Narrow match
+        curDiff = 0.0;
+        matchedDiff = 100.0;
+        ArrayList<NationsRecord> matchingPop = new ArrayList<>();
+        for (NationsRecord nr : nearMatchingNR) {
+            curDiff = Math.abs(unknownNR.getLife_expect() - nr.getLife_expect());
+            if (matchedDiff > curDiff) {
+                matchedDiff = curDiff;
+                matchingPop.add(nr);
+            }
+        }
+        if (matchingPop.size() == 0) {
+            return matchingLE.get(0);
+        }
+        return matchingPop.get(0);
     }
 
     private void printData(ArrayList<NationsRecord> nationalData)

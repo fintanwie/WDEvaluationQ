@@ -9,10 +9,11 @@ import java.util.Map;
 /**
  * Created by fward on 12/12/2017.
  */
-public class ParseNations2File extends ParseDataFile
+public class ParseNations2File extends ParseCSVFile
 {
     private String YEAR_FILTER = "2014";
 
+    @SuppressWarnings("unchecked")
     public void getData(List<NationsRecord> nationalData)
     {
         List<Map<String, String>> parsedData;
@@ -22,7 +23,7 @@ public class ParseNations2File extends ParseDataFile
             fileHeaders.add("year");
             fileHeaders.add("gdp_percap");
 
-            parsedData = readCSVFile3("nations2.csv", fileHeaders);
+            parsedData = readCSVFile("nations2.csv", fileHeaders);
         }
         catch (Exception ex) {
             System.out.println("Error reading the file.");
@@ -31,7 +32,7 @@ public class ParseNations2File extends ParseDataFile
         createNationalData((ArrayList)nationalData, parsedData);
     }
 
-    private ArrayList<NationsRecord> createNationalData(ArrayList<NationsRecord> nationalData,
+    private void createNationalData(ArrayList<NationsRecord> nationalData,
                                     List<Map<String, String>> parsedData ) {
         for (Map<String, String> record : parsedData) {
             if (record.get("year").equals(YEAR_FILTER)) {
@@ -50,7 +51,6 @@ public class ParseNations2File extends ParseDataFile
                 }
             }
         }
-        return nationalData;
     }
 
     protected void handleLF(StringBuffer curVal) {

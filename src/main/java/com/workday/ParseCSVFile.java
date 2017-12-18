@@ -16,20 +16,18 @@ import java.util.TreeSet;
 /**
  * Created by fward on 12/12/2017.
  */
-abstract public class ParseDataFile
+abstract public class ParseCSVFile
 {
     protected static final char DEFAULT_SEPARATOR = ',';
     protected static final char DEFAULT_QUOTE = '"';
 
     abstract void getData(List<NationsRecord> nationalData);
 
-    protected List<Map<String, String>> readCSVFile3(String fileName, List<String> fileHeaders) throws Exception
+    protected List<Map<String, String>> readCSVFile(String fileName, List<String> fileHeaders) throws Exception
     {
         StringBuilder fileData = new StringBuilder();
         fileData.append(parseDataFile(fileName));
-
-        List<Map<String, String>> parsedData = parseInputData(fileHeaders, fileData);
-        return parsedData;
+        return parseInputData(fileHeaders, fileData);
     }
 
     private List<Map<String, String>> parseInputData(List<String> allHeaders, StringBuilder fileData)
@@ -42,7 +40,7 @@ abstract public class ParseDataFile
                 "Upper middle income", "Lower middle income", "Not classified"));
 
         int dataPointPosition = -1;
-        String partialDataPoint = "";
+        StringBuilder partialDataPoint = new StringBuilder();
         boolean processingQoutedWord = false;
         String[] data = fileData.toString().split(",");
         for (String datapoint : data) {
@@ -51,20 +49,11 @@ abstract public class ParseDataFile
             if (!processingQoutedWord)
                 datapoint = datapoint.trim();
 
-            String headerFound = doesDatapointContainHeader(headers, datapoint);
-            if (!headerFound.isEmpty()) {
-                // Check for embedded dataPoint in headers
-                headers.remove(headerFound);
-                datapoint = datapoint.replace(headerFound, "");
-                dataPointFound += datapoint;
-                if (datapoint.isEmpty())
-                    processDataPoint = false;
-            }
-            else if (datapoint.contains("\"")) {
+            if (datapoint.contains("\"")) {
                 if (processingQoutedWord) {
                     processingQoutedWord = false;
-                    datapoint = partialDataPoint + "," + removeQoutesFromDatapoint(datapoint);
-                    partialDataPoint = "";
+                    datapoint = partialDataPoint.append(",").append(removeQoutesFromDatapoint(datapoint)).toString();
+                    partialDataPoint = new StringBuilder();
                 }
                 // Process datapoint that is wrapped in qoutes
                 else if (datapoint.startsWith("\"") && datapoint.endsWith("\"")) {
@@ -73,7 +62,7 @@ abstract public class ParseDataFile
                 // process datapoints with qoute at start of Word.
                 else if (datapoint.startsWith("\"")) {
                     processingQoutedWord = true;
-                    partialDataPoint += removeQoutesFromDatapoint(datapoint);
+                    partialDataPoint.append(removeQoutesFromDatapoint(datapoint));
                     continue;
                 }
                 dataPointFound += datapoint;
@@ -118,7 +107,7 @@ abstract public class ParseDataFile
 
     private String removeQoutesFromDatapoint(String datapoint)
     {
-        if (datapoint == null | datapoint.length() == 0) return "";
+        if (datapoint == null || datapoint.length() == 0) return "";
         return datapoint.replace("\"", "");
     }
 
@@ -195,7 +184,7 @@ abstract public class ParseDataFile
         char[] compactArray = new char[charCount + 1];
         for (int i = 0; i <= charCount; i++) {
             compactArray[i] = charArray[i];
-        };
+        }
         return compactArray;
     }
 
@@ -216,8 +205,6 @@ abstract public class ParseDataFile
         StringBuilder result = new StringBuilder();
         if (charArray == null) return result;
 
-        char customQuote = DEFAULT_QUOTE;
-        char separator = DEFAULT_SEPARATOR;
         StringBuffer curVal = new StringBuffer();
         boolean inQuotes = false;
         boolean inWord = false;
@@ -253,15 +240,13 @@ abstract public class ParseDataFile
 
                 if (ch == '\r') {
                     handleLF(curVal);
-                    continue;
                 }
                 else if (ch == '\n') {
                     handleCF(curVal);
-                    continue;
                 }
             }
             else {
-                if (ch == customQuote) {
+                if (ch == DEFAULT_QUOTE) {
                     inQuotes = true;
                     inWord = true;
                     curVal.append('"');
@@ -271,19 +256,17 @@ abstract public class ParseDataFile
                         curVal.append('"');
                     }
                 }
-                else if (ch == separator) {
+                else if (ch == DEFAULT_SEPARATOR) {
                     inWord = false;
-                    result.append(curVal.toString()).append(separator);
+                    result.append(curVal.toString()).append(DEFAULT_SEPARATOR);
                     curVal = new StringBuffer();
                     startCollectChar = false;
                 }
                 else if (ch == '\r') {
                     handleLF(curVal);
-                    continue;
                 }
                 else if (ch == '\n') {
                     handleCF(curVal);
-                    continue;
                 }
                 else {
                     inWord = true;

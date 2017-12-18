@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Created by fward on 12/12/2017.
  */
-public class ParseNations1File extends ParseDataFile
+public class ParseNations1File extends ParseCSVFile
 {
     private String YEAR_FILTER = "2014";
 
@@ -25,7 +25,7 @@ public class ParseNations1File extends ParseDataFile
             fileHeaders.add("neonat_mortal_rate");
             fileHeaders.add("region");
             fileHeaders.add("income");
-            parsedData = readCSVFile3("nations1.csv", fileHeaders);
+            parsedData = readCSVFile("nations1.csv", fileHeaders);
         }
         catch (Exception ex) {
             System.out.println("Error reading the file.");
