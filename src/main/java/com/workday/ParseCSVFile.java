@@ -27,6 +27,7 @@ abstract public class ParseCSVFile
     {
         StringBuilder fileData = new StringBuilder();
         fileData.append(parseDataFile(fileName));
+
         return parseInputData(fileHeaders, fileData);
     }
 
@@ -49,7 +50,16 @@ abstract public class ParseCSVFile
             if (!processingQoutedWord)
                 datapoint = datapoint.trim();
 
-            if (datapoint.contains("\"")) {
+            String headerFound = doesDatapointContainHeader(headers, datapoint);
+            if (!headerFound.isEmpty()) {
+                // Check for embedded dataPoint in headers
+                headers.remove(headerFound);
+                datapoint = datapoint.replace(headerFound, "");
+                dataPointFound += datapoint;
+                if (datapoint.isEmpty())
+                    processDataPoint = false;
+            }
+            else if (datapoint.contains("\"")) {
                 if (processingQoutedWord) {
                     processingQoutedWord = false;
                     datapoint = partialDataPoint.append(",").append(removeQoutesFromDatapoint(datapoint)).toString();
@@ -107,7 +117,7 @@ abstract public class ParseCSVFile
 
     private String removeQoutesFromDatapoint(String datapoint)
     {
-        if (datapoint == null || datapoint.length() == 0) return "";
+        if (datapoint == null | datapoint.length() == 0) return "";
         return datapoint.replace("\"", "");
     }
 
@@ -184,7 +194,7 @@ abstract public class ParseCSVFile
         char[] compactArray = new char[charCount + 1];
         for (int i = 0; i <= charCount; i++) {
             compactArray[i] = charArray[i];
-        }
+        };
         return compactArray;
     }
 
@@ -205,6 +215,8 @@ abstract public class ParseCSVFile
         StringBuilder result = new StringBuilder();
         if (charArray == null) return result;
 
+        char customQuote = DEFAULT_QUOTE;
+        char separator = DEFAULT_SEPARATOR;
         StringBuffer curVal = new StringBuffer();
         boolean inQuotes = false;
         boolean inWord = false;
@@ -240,13 +252,15 @@ abstract public class ParseCSVFile
 
                 if (ch == '\r') {
                     handleLF(curVal);
+                    continue;
                 }
                 else if (ch == '\n') {
                     handleCF(curVal);
+                    continue;
                 }
             }
             else {
-                if (ch == DEFAULT_QUOTE) {
+                if (ch == customQuote) {
                     inQuotes = true;
                     inWord = true;
                     curVal.append('"');
@@ -256,17 +270,19 @@ abstract public class ParseCSVFile
                         curVal.append('"');
                     }
                 }
-                else if (ch == DEFAULT_SEPARATOR) {
+                else if (ch == separator) {
                     inWord = false;
-                    result.append(curVal.toString()).append(DEFAULT_SEPARATOR);
+                    result.append(curVal.toString()).append(separator);
                     curVal = new StringBuffer();
                     startCollectChar = false;
                 }
                 else if (ch == '\r') {
                     handleLF(curVal);
+                    continue;
                 }
                 else if (ch == '\n') {
                     handleCF(curVal);
+                    continue;
                 }
                 else {
                     inWord = true;
