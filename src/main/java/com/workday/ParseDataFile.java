@@ -18,8 +18,8 @@ import java.util.TreeSet;
  */
 abstract public class ParseDataFile
 {
-    private static final char DEFAULT_SEPARATOR = ',';
-    private static final char DEFAULT_QUOTE = '"';
+    protected static final char DEFAULT_SEPARATOR = ',';
+    protected static final char DEFAULT_QUOTE = '"';
 
     abstract void getData(List<NationsRecord> nationalData);
 

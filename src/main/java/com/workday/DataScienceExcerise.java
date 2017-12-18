@@ -31,13 +31,12 @@ public class DataScienceExcerise
         nations2Parser.getData(nationalData);
     }
 
+    @SuppressWarnings("unchecked")
     private void displayMenu()
     {
         int choice;
-        boolean poppingMenu;
         boolean quit = false;
         while (!quit) {
-            poppingMenu = false;
             printInstructions();
             System.out.println("Enter your choice : ");
             choice = scanner.nextInt();
@@ -54,7 +53,7 @@ public class DataScienceExcerise
                     scanner.nextLine();
                     break;
                 case 2:
-                    poppingMenu = displayOutliersMenu();
+                    displayOutliersMenu();
                     break;
                 case 3:
                     findLowerIncomes();
@@ -69,12 +68,6 @@ public class DataScienceExcerise
                 case 5:
                     quit = true;
                     break;
-            }
-
-            if (!quit) {
-                if (!poppingMenu) {
-//                    scanner.nextLine();
-                }
             }
         }
     }
@@ -91,7 +84,7 @@ public class DataScienceExcerise
         System.out.println("\t5 - To quit the application");
     }
 
-    private boolean displayOutliersMenu()
+    private void displayOutliersMenu()
     {
         int choice;
         boolean quit = false;
@@ -124,13 +117,7 @@ public class DataScienceExcerise
                     quit = true;
                     break;
             }
-
-            if (!quit) {
-//                System.out.println("Press Enter To Continue");
-//                scanner.nextLine();
-            }
         }
-        return true;
     }
 
     private void printOutliersInstruction()
@@ -144,77 +131,28 @@ public class DataScienceExcerise
         System.out.println("\t4 - Go back to main menu");
     }
 
-
     private void displayLifeExpectencyOutlier()
     {
         Collections.sort(nationalData, NationsRecord.getLifeExpectencyComparator());
-        float size = nationalData.size();
-        float middle = size / 2;
-        float meanPosition = (size / 2) / 2;
-        float lowerMean = (0 + meanPosition);
-        float higherMean = (middle + meanPosition);
-
-        Double Q1 = nationalData.get((int) lowerMean - 1).getLife_expect() +
-                nationalData.get((int) lowerMean + 1).getLife_expect() / 2;
-        Double Q3 = nationalData.get((int) higherMean - 1).getLife_expect() +
-                nationalData.get((int) higherMean + 1).getLife_expect() / 2;
-
-        Double innerQuartileRange = Q3 - Q1;
-        Double HighOutliner = Q3 + (1.5 * innerQuartileRange);
-        Double LowOutliner = Q1 - (1.5 * innerQuartileRange);
-
-        ArrayList<NationsRecord> LowOutliers = new ArrayList<>();
-        ArrayList<NationsRecord> HighOutliers = new ArrayList<>();
-        for (NationsRecord nr : nationalData) {
-            if (nr.getLife_expect() < LowOutliner)
-                LowOutliers.add(nr);
-            if (nr.getLife_expect() > HighOutliner)
-                HighOutliers.add(nr);
-        }
-        System.out.println("HighOutliers  : (" + HighOutliner + ") : " + HighOutliers.size());
-        if (HighOutliers.size() > 0) printData(HighOutliers);
-        System.out.println("LowOutliers  : (" + LowOutliner + ") : " + LowOutliers.size());
-        if (LowOutliers.size() > 0) printData(LowOutliers);
+        displayOutliers(nationalData);
     }
 
     private void displayGDPOutlier()
     {
         Collections.sort(nationalData, NationsRecord.getGDPComparator());
-        float size = nationalData.size();
-        float middle = size / 2;
-        float meanPosition = (size / 2) / 2;
-        float lowerMean = (0 + meanPosition);
-        float higherMean = (middle + meanPosition);
-
-        Double Q1 = nationalData.get((int) lowerMean - 1).getGdp_percap() +
-                nationalData.get((int) lowerMean + 1).getGdp_percap() / 2;
-        Double Q3 = nationalData.get((int) higherMean - 1).getGdp_percap() +
-                nationalData.get((int) higherMean + 1).getGdp_percap() / 2;
-
-        Double innerQuartileRange = Q3 - Q1;
-        Double HighOutliner = Q3 + (1.5 * innerQuartileRange);
-        Double LowOutliner = Q1 - (1.5 * innerQuartileRange);
-
-        ArrayList<NationsRecord> LowOutliers = new ArrayList<>();
-        ArrayList<NationsRecord> HighOutliers = new ArrayList<>();
-        for (NationsRecord nr : nationalData) {
-            if (nr.getGdp_percap() < LowOutliner)
-                LowOutliers.add(nr);
-            if (nr.getGdp_percap() > HighOutliner)
-                HighOutliers.add(nr);
-        }
-        System.out.println("HighOutliers  : (" + HighOutliner + ") : " + HighOutliers.size());
-        if (HighOutliers.size() > 0) printData(HighOutliers);
-        System.out.println("LowOutliers  : (" + LowOutliner + ") : " + LowOutliers.size());
-        if (LowOutliers.size() > 0) printData(LowOutliers);
+        displayOutliers(nationalData);
     }
 
     private void displayPopulationOutlier()
     {
         Collections.sort(nationalData, NationsRecord.getPopulationComparator());
+        displayOutliers(nationalData);
+    }
+
+    private void displayOutliers(List<NationsRecord> nationalData) {
         float size = nationalData.size();
         float middle = size / 2;
-        float meanPosition = (size / 2) / 2;
+        float meanPosition = middle / 2;
         float lowerMean = (0 + meanPosition);
         float higherMean = (middle + meanPosition);
 
