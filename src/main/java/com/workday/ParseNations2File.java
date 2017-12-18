@@ -35,7 +35,25 @@ public class ParseNations2File
             if(debug) System.out.println("Error reading the file.");
         }
 
-        // Create national records
+        nationalData = createNationalData(nationalData, parsedData);
+        if(debug) System.out.println("nationalData : "  + nationalData);
+    }
+
+    protected List<Map<String, String>> readCSVFile3(String fileName, List<String> fileHeaders) throws Exception {
+        boolean debug = false;
+        StringBuilder fileData = new StringBuilder();
+        fileData.append(parseDataFile(fileName));
+
+        if(debug) System.out.println("\nSTART PARSING DATA.");
+        List<Map<String, String>> parsedData = parseInputData(fileHeaders, fileData);
+        if(debug) System.out.println("\nEND PARSING DATA.");
+        if(debug) printParsedData(fileHeaders, parsedData);
+        return parsedData;
+    }
+
+    private ArrayList<NationsRecord> createNationalData(ArrayList<NationsRecord> nationalData,
+                                    List<Map<String, String>> parsedData ) {
+        boolean debug = false;
         boolean testRun = false;
         for (Map<String, String> record : parsedData) {
             if(debug) System.out.println("ParseNations2File : getData : " + record.toString());
@@ -59,22 +77,10 @@ public class ParseNations2File
                 }
             }
         }
-        if(debug) System.out.println("nationalData : "  + nationalData);
+        return nationalData;
     }
 
-    public List<Map<String, String>> readCSVFile3(String fileName, List<String> fileHeaders) throws Exception {
-        boolean debug = false;
-        StringBuilder fileData = new StringBuilder();
-        fileData.append(parseDataFile(fileName));
-
-        if(debug) System.out.println("\nSTART PARSING DATA.");
-        List<Map<String, String>> parsedData = parseInputData(fileHeaders, fileData);
-        if(debug) System.out.println("\nEND PARSING DATA.");
-        if(debug) printParsedData(fileHeaders, parsedData);
-        return parsedData;
-    }
-
-    public List<Map<String, String>> parseInputData(List<String> allHeaders, StringBuilder fileData) {
+    private List<Map<String, String>> parseInputData(List<String> allHeaders, StringBuilder fileData) {
         boolean debug = false;
         if(debug) System.out.println("parseInputData : Parsing Data");
         ArrayList<Map<String, String>> parsedData = new ArrayList<>();
@@ -189,11 +195,11 @@ public class ParseNations2File
             }
         }
         if(debug) System.out.println("parseInputData 8: returning parsed Data: ");
-        //printParsedData(parsedData);
+        if(debug) printParsedData(allHeaders, parsedData);
         return parsedData;
     }
 
-    public void printParsedData(List<String> allHeaders, List<Map<String, String>> parsedData) {
+    private void printParsedData(List<String> allHeaders, List<Map<String, String>> parsedData) {
         System.out.print("Headers   : ");
         for (String field : allHeaders) {
             String text = "[" + field + "], ";
@@ -217,12 +223,12 @@ public class ParseNations2File
         }
     }
 
-    public String removeQoutesFromDatapoint(String datapoint) {
+    private String removeQoutesFromDatapoint(String datapoint) {
         if (datapoint == null | datapoint.length() == 0) return "";
         return  datapoint.replace("\"", "");
     }
 
-    public boolean checkForLastHeader(List<String> allHeaders, int dataPointPosition) {
+    private boolean checkForLastHeader(List<String> allHeaders, int dataPointPosition) {
         boolean debug = false;
         if (debug) System.out.println("checkForLastHeader.");
         int currentPosition = dataPointPosition % allHeaders.size();
@@ -234,7 +240,7 @@ public class ParseNations2File
         return false;
     }
 
-    public StringBuilder parseDataFile(String fileName) throws Exception {
+    private StringBuilder parseDataFile(String fileName) throws Exception {
         boolean debug = false;
         StringBuilder data = new StringBuilder();
         InputStream is = null;
@@ -294,22 +300,21 @@ public class ParseNations2File
         return data;
     }
 
-    public char[] addToCharArray(char[] charArray, int charCount, int value ) {
+    private void addToCharArray(char[] charArray, int charCount, int value ) {
         boolean debug = false;
         char c = (char)value;
         charArray[charCount] = c;
         if (debug) System.out.println("New Letter : " + charCount + " : [" + c + "]."  + value);
-        return charArray;
     }
 
-    public void printCharArray(char[] array) {
+    private void printCharArray(char[] array) {
         for(int i=0; i < array.length; i++) {
             array[i] = array[i];
             System.out.print(array[i]);
         }System.out.print("].\n");
     }
 
-    public char[] resizeCharArray(char[] charArray, int charCount) {
+    private char[] resizeCharArray(char[] charArray, int charCount) {
         boolean debug = false;
         char[] compactArray = new char[charCount+1];
         if (debug) System.out.println("==>> resizeCharArray charCount : " + charCount);
@@ -324,7 +329,7 @@ public class ParseNations2File
         return compactArray;
     }
 
-    public String doesDatapointContainHeader(Set<String> headers, String word) {
+    private String doesDatapointContainHeader(Set<String> headers, String word) {
         boolean debug = false;
         String containsHeader = "";
         for (String header : headers)
@@ -335,7 +340,7 @@ public class ParseNations2File
         return containsHeader;
     }
 
-    public StringBuilder parseCharArray(char[] charArray) {
+    private StringBuilder parseCharArray(char[] charArray) {
         boolean debug = false;
         StringBuilder result = new StringBuilder();
         if(debug) System.out.println("In parseCharArray.");
@@ -389,9 +394,9 @@ public class ParseNations2File
                         }
                     }
                 }
+
                 if (ch == '\r') {
                     if (debug) System.out.println("In LF");
-                    //ignore LF characters
                     curVal.append(",");
                     continue;
                 } else if (ch == '\n') {
@@ -426,7 +431,6 @@ public class ParseNations2File
                 } else if (ch == '\r') {
                     // catch LF characters
                     if (debug) System.out.println("parseCharArray : In LF");
-
                     curVal.append(',');
                     if (debug) System.out.println("parseCharArray : Adding seperator.");
                     continue;

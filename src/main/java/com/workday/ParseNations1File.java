@@ -21,9 +21,9 @@ public class ParseNations1File
     private static final char DEFAULT_SEPARATOR = ',';
     private static final char DEFAULT_QUOTE = '"';
 
-    public ArrayList<NationsRecord> getData() {
-        boolean debug = false;
-        List<Map<String, String>> parsedData = new ArrayList<>();
+    public ArrayList<NationsRecord> getData()
+    {
+        List<Map<String, String>> parsedData;
         try {
             List<String> fileHeaders = new ArrayList<>();
             fileHeaders.add("iso2c");
@@ -36,62 +36,59 @@ public class ParseNations1File
             fileHeaders.add("neonat_mortal_rate");
             fileHeaders.add("region");
             fileHeaders.add("income");
-            if(debug) System.out.println("fileHeaders :" + fileHeaders);
-            parsedData =  readCSVFile3("nations1.csv", fileHeaders);
-        } catch (Exception ex) {
-            if(debug) System.out.println("Error reading the file.");
+            parsedData = readCSVFile3("nations1.csv", fileHeaders);
+        }
+        catch (Exception ex) {
+            System.out.println("Error reading the file.");
+            return null;
         }
 
         // Create national records
-        ArrayList<NationsRecord> national1Data  = new ArrayList<>();
+        ArrayList<NationsRecord> national1Data = new ArrayList<>();
         for (Map<String, String> record : parsedData) {
-            if(debug) System.out.println("ParseNations1File : getData : " + record.toString());
             if (record.get("year").equals("2014")) {
-                if(debug) System.out.println("ParseNations1File : getData : Creating Record.");
                 national1Data.add(new NationsRecord(record));
             }
         }
-        if(debug) System.out.println("nationalData : "  + national1Data);
         return national1Data;
     }
 
-    public List<Map<String, String>> readCSVFile3(String fileName, List<String> fileHeaders) throws Exception {
+    protected List<Map<String, String>> readCSVFile3(String fileName, List<String> fileHeaders) throws Exception
+    {
         StringBuilder fileData = new StringBuilder();
         fileData.append(parseDataFile(fileName));
 
-        //System.out.println("\nSTART PARSING DATA.");
         List<Map<String, String>> parsedData = parseInputData(fileHeaders, fileData);
-        //System.out.println("\nEND PARSING DATA.");
-        //printParsedData(fileHeaders, parsedData);
         return parsedData;
     }
 
-    public List<Map<String, String>> parseInputData(List<String> allHeaders, StringBuilder fileData) {
+    private List<Map<String, String>> parseInputData(List<String> allHeaders, StringBuilder fileData)
+    {
         boolean debug = false;
-        if(debug) System.out.println("parseInputData : Parsing Data");
+        if (debug) System.out.println("parseInputData : Parsing Data");
         ArrayList<Map<String, String>> parsedData = new ArrayList<>();
         Map<String, String> aRecord = new TreeMap<>();
         Set<String> headers = new TreeSet<>();
         headers.addAll(allHeaders);
         ArrayList<String> incomeValues = new ArrayList<String>(Arrays.asList("High income", "Low income",
-                "Upper middle income","Lower middle income","Not classified"));
+                "Upper middle income", "Lower middle income", "Not classified"));
 
         int dataPointPosition = -1;
         String partialDataPoint = "";
         boolean processingQoutedWord = false;
         String[] data = fileData.toString().split(",");
-        if(debug) System.out.println("parseInputData data size is : " + data.length);
+        if (debug) System.out.println("parseInputData data size is : " + data.length);
         for (String datapoint : data) {
             String dataPointFound = "";
             boolean processDataPoint = true;
             if (!processingQoutedWord)
                 datapoint = datapoint.trim();
-            if(debug) System.out.println("parseInputData 1: data : " + datapoint);
+            if (debug) System.out.println("parseInputData 1: data : " + datapoint);
 
             String headerFound = doesDatapointContainHeader(headers, datapoint);
             if (!headerFound.isEmpty()) {
                 // Check for embedded dataPoint in headers
-                if(debug) System.out.println("parseInputData 2: Check for embedded dataPoint.");
+                if (debug) System.out.println("parseInputData 2: Check for embedded dataPoint.");
                 headers.remove(headerFound);
                 datapoint = datapoint.replace(headerFound, "");
                 dataPointFound += datapoint;
@@ -99,22 +96,22 @@ public class ParseNations1File
                     processDataPoint = false;
             }
             else if (datapoint.contains("\"")) {
-                if(debug) System.out.println("parseInputData 2a: process qouted datapoint");
+                if (debug) System.out.println("parseInputData 2a: process qouted datapoint");
                 // process qouted datapoint
                 if (processingQoutedWord) {
-                    if(debug) System.out.println("parseInputData : processingQoutedWord");
+                    if (debug) System.out.println("parseInputData : processingQoutedWord");
                     processingQoutedWord = false;
                     datapoint = partialDataPoint + "," + removeQoutesFromDatapoint(datapoint);
                     partialDataPoint = "";
                 }
                 // Process datapoint that is wrapped in qoutes
-                else if(datapoint.startsWith("\"") && datapoint.endsWith("\"")) {
-                    if(debug) System.out.println("parseInputData : wrapping qoutes.");
+                else if (datapoint.startsWith("\"") && datapoint.endsWith("\"")) {
+                    if (debug) System.out.println("parseInputData : wrapping qoutes.");
                     datapoint = removeQoutesFromDatapoint(datapoint);
                 }
                 // process datapoints with qoute at start of Word.
                 else if (datapoint.startsWith("\"")) {
-                    if(debug) System.out.println("parseInputData : Qoutes at start of word.");
+                    if (debug) System.out.println("parseInputData : Qoutes at start of word.");
                     processingQoutedWord = true;
                     partialDataPoint += removeQoutesFromDatapoint(datapoint);
                     continue;
@@ -124,102 +121,90 @@ public class ParseNations1File
             else {
                 // Handle correctly formatted datapoint.;
                 dataPointFound += datapoint;
-                if(debug) System.out.println("This is a correctly formatted  data field [" + datapoint + "]");
+                if (debug)
+                    System.out.println("This is a correctly formatted  data field [" + datapoint + "]");
             }
-            if(debug) System.out.println("parseInputData 3: datapoint : [" + datapoint + "].");
+            if (debug) System.out.println("parseInputData 3: datapoint : [" + datapoint + "].");
 
             if (processDataPoint) {
                 dataPointPosition++;
                 int headerNumber = dataPointPosition % allHeaders.size();
-                if(debug) System.out.println("parseInputData 5a: dataPointPosition : [" + dataPointPosition + "].");
-                if(debug) System.out.println("parseInputData 5a: headerNumber : [" + headerNumber + "].");
+                if (debug)
+                    System.out.println("parseInputData 5a: dataPointPosition : [" + dataPointPosition + "].");
+                if (debug) System.out.println("parseInputData 5a: headerNumber : [" + headerNumber + "].");
 
                 String fieldName = allHeaders.get(headerNumber);
-                if(debug) System.out.println("parseInputData 4: Handle Data Point : ["
+                if (debug) System.out.println("parseInputData 4: Handle Data Point : ["
                         + headerNumber
                         + "]. datapoint : [" + dataPointFound + "].");
-                if(debug) System.out.println("Add to Map : [" + fieldName + "] = [" + dataPointFound + "].");
+                if (debug) System.out.println("Add to Map : [" + fieldName + "] = [" + dataPointFound + "].");
                 //if (headerNumber == 0) {
-                if(debug) System.out.println("parseInputData 4a : " + headerNumber + " == " + allHeaders.size());
+                if (debug)
+                    System.out.println("parseInputData 4a : " + headerNumber + " == " + allHeaders.size());
                 //if (headerNumber == allHeaders.size()) {
                 if (checkForLastHeader(allHeaders, dataPointPosition)) {
                     // Store record and start a new one
 
-                    if(debug) System.out.println("parseInputData 5a: Found last header");
-                    if(debug) System.out.println("parseInputData 5a: dataPointFound [" + dataPointFound + "].");
-                    if(debug) System.out.println("parseInputData 5b : " + aRecord.size() + " == " + allHeaders.size());
+                    if (debug) System.out.println("parseInputData 5a: Found last header");
+                    if (debug)
+                        System.out.println("parseInputData 5a: dataPointFound [" + dataPointFound + "].");
+                    if (debug) System.out.println(
+                            "parseInputData 5b : " + aRecord.size() + " == " + allHeaders.size());
 
                     String firstFieldOfNextRecord = "";
                     for (String incomeValue : incomeValues) {
                         if (dataPointFound.contains(incomeValue)) {
                             firstFieldOfNextRecord = dataPointFound.replace(incomeValue, "");
                             dataPointFound = incomeValue;
-                            if(debug) System.out.println("parseInputData 5c: firstFieldOfNextRecord : " + firstFieldOfNextRecord);
-                            if(debug) System.out.println("parseInputData 5d: dataPointFound : " + dataPointFound);
+                            if (debug) System.out.println(
+                                    "parseInputData 5c: firstFieldOfNextRecord : " + firstFieldOfNextRecord);
+                            if (debug)
+                                System.out.println("parseInputData 5d: dataPointFound : " + dataPointFound);
                         }
                     }
-                    if(debug) System.out.println("parseInputData 5c2 : Adding : " + fieldName + " , " + dataPointFound);
+                    if (debug) System.out.println(
+                            "parseInputData 5c2 : Adding : " + fieldName + " , " + dataPointFound);
                     aRecord.put(fieldName, dataPointFound);
 
-                    if(debug) System.out.println("parseInputData 5e: " + aRecord.size() + " == " + allHeaders.size());
+                    if (debug) System.out.println(
+                            "parseInputData 5e: " + aRecord.size() + " == " + allHeaders.size());
                     if (aRecord.size() == allHeaders.size()) {
-                        if(debug) System.out.println("parseInputData 5f: Storing Record : [" + aRecord + "].");
+                        if (debug)
+                            System.out.println("parseInputData 5f: Storing Record : [" + aRecord + "].");
                         parsedData.add(aRecord);
                     }
-                    if(debug) System.out.println("parseInputData 6: Clearing record.");
+                    if (debug) System.out.println("parseInputData 6: Clearing record.");
                     aRecord = new LinkedHashMap<>();
                     if (firstFieldOfNextRecord.length() > 0) {
-                        if(debug) System.out.println("parseInputData 6a: Adding Field [" + allHeaders.get(allHeaders.size()-1) +
-                                " ]: [" + firstFieldOfNextRecord + "].");
+                        if (debug) System.out.println(
+                                "parseInputData 6a: Adding Field [" + allHeaders.get(allHeaders.size() - 1) +
+                                        " ]: [" + firstFieldOfNextRecord + "].");
                         aRecord.put(allHeaders.get(0), firstFieldOfNextRecord);
                         dataPointPosition++;
                         continue;
                     }
                 }
-                if(debug) System.out.println("parseInputData 8: Adding Field [" + fieldName + "] : [" +
+                if (debug) System.out.println("parseInputData 8: Adding Field [" + fieldName + "] : [" +
                         dataPointFound + "].");
                 aRecord.put(fieldName, dataPointFound);
             }
         }
-        if(debug) System.out.println("parseInputData 8: returning parsed Data: ");
-        //printParsedData(parsedData);
+        if (debug) System.out.println("parseInputData 8: returning parsed Data: ");
         return parsedData;
     }
 
-    public void printParsedData(List<String> allHeaders, List<Map<String, String>> parsedData) {
-        System.out.print("Headers   : ");
-        for (String field : allHeaders) {
-            String text = "[" + field + "], ";
-            for (int j = field.length(); j < 26; j++) {
-                text += " ";
-            }
-            System.out.print(text);
-        }
-
-        int i=0;
-        for (Map<String, String> record : parsedData) {
-            System.out.print(String.format("\nRecord %02d : ", ++i));
-            for (String field : allHeaders) {
-                String fieldValue = record.get(field);
-                String text = "[" + fieldValue + "], ";
-                for (int j = fieldValue.length(); j < 26; j++) {
-                    text += " ";
-                }
-                System.out.print(text);
-            }
-        }
-    }
-
-    public String removeQoutesFromDatapoint(String datapoint) {
+    private String removeQoutesFromDatapoint(String datapoint)
+    {
         if (datapoint == null | datapoint.length() == 0) return "";
-        return  datapoint.replace("\"", "");
+        return datapoint.replace("\"", "");
     }
 
-    public boolean checkForLastHeader(List<String> allHeaders, int dataPointPosition) {
+    private boolean checkForLastHeader(List<String> allHeaders, int dataPointPosition)
+    {
         boolean debug = false;
         if (debug) System.out.println("checkForLastHeader.");
         int currentPosition = dataPointPosition % allHeaders.size();
-        if (currentPosition == allHeaders.size()-1) {
+        if (currentPosition == allHeaders.size() - 1) {
             if (debug) System.out.println("checkForLastHeader 1: At Last Header");
             return true;
         }
@@ -227,7 +212,8 @@ public class ParseNations1File
         return false;
     }
 
-    public StringBuilder parseDataFile(String fileName) throws Exception {
+    private StringBuilder parseDataFile(String fileName) throws Exception
+    {
         boolean debug = false;
         StringBuilder data = new StringBuilder();
         InputStream is = null;
@@ -244,86 +230,81 @@ public class ParseNations1File
             int value = 0;
             int charCount = -1;
             char[] charArray = new char[11];
-            while((value = br.read()) != -1) {
+            while ((value = br.read()) != -1) {
                 charCount++;
-                if(debug) System.out.println("charCount is : " + charCount);
+                if (debug) System.out.println("charCount is : " + charCount);
                 if (charCount >= 10) {
                     addToCharArray(charArray, charCount, value);
-                    if(debug) System.out.println("charArray is : [" + charArray.length + "]. charCount is [" + charCount + "]. Letter is : [" + (char)value + "]." );
+                    if (debug) System.out.println(
+                            "charArray is : [" + charArray.length + "]. charCount is [" + charCount + "]. Letter is : [" + (char) value + "].");
                     StringBuffer line = new StringBuffer();
-                    for (int i=0; i == charArray.length; i++) {
+                    for (int i = 0; i == charArray.length; i++) {
                         line.append(charArray[i]);
                     }
-                    if(debug) printCharArray(charArray);
+                    if (debug) printCharArray(charArray);
                     data.append(parseCharArray(charArray));
-                    charArray= new char[11];
+                    charArray = new char[11];
                     charCount = -1;
-                } else {
+                }
+                else {
                     addToCharArray(charArray, charCount, value);
-                    if(debug) printCharArray(charArray);
+                    if (debug) printCharArray(charArray);
                 }
             }
-            if(debug) System.out.println("Read Done : ");
-            if (charCount > -1 ) {
-                if(debug) System.out.println("==>> Test Char charArray   [" + (charCount) + "] : " + charArray[charCount]);
+            if (debug) System.out.println("Read Done : ");
+            if (charCount > -1) {
+                if (debug) System.out.println(
+                        "==>> Test Char charArray   [" + (charCount) + "] : " + charArray[charCount]);
                 char[] compactArray = resizeCharArray(charArray, charCount);
-                if(debug) System.out.println("==>> Test Char compactArray[" + (compactArray.length-1) + "] : " + compactArray[compactArray.length-1]);
-                if(debug) printCharArray(compactArray);
+                if (debug) System.out.println(
+                        "==>> Test Char compactArray[" + (compactArray.length - 1) + "] : " + compactArray[compactArray.length - 1]);
+                if (debug) printCharArray(compactArray);
                 data.append(compactArray);
             }
-            if(debug) System.out.println("dataFile : " + data.toString());
-            if(debug) System.out.println("END PARSING FILE.");
-        } catch(Exception e) {
+            if (debug) System.out.println("dataFile : " + data.toString());
+            if (debug) System.out.println("END PARSING FILE.");
+        }
+        catch (Exception e) {
             e.printStackTrace();
-        } finally {
+        }
+        finally {
             // releases resources associated with the streams
-            if(is!=null)
+            if (is != null)
                 is.close();
-            if(isr!=null)
+            if (isr != null)
                 isr.close();
-            if(br!=null)
+            if (br != null)
                 br.close();
         }
         return data;
     }
 
-    public char[] addToCharArray(char[] charArray, int charCount, int value ) {
+    private void addToCharArray(char[] charArray, int charCount, int value)
+    {
         boolean debug = false;
-        char c = (char)value;
+        char c = (char) value;
         charArray[charCount] = c;
-        if (debug) System.out.println("New Letter : " + charCount + " : [" + c + "]."  + value);
-        return charArray;
+        if (debug) System.out.println("New Letter : " + charCount + " : [" + c + "]." + value);
     }
 
-    public void printArrayList(List<String> wordList) {
-        System.out.println("Printing ArrayList : ");
-        for (String word : wordList)
-            System.out.println("Word is : " + word);
-    }
-
-    public void printCharArray(char[] array) {
-        for(int i=0; i < array.length; i++) {
+    private void printCharArray(char[] array)
+    {
+        for (int i = 0; i < array.length; i++) {
             array[i] = array[i];
             System.out.print(array[i]);
-        }System.out.print("].\n");
+        }
+        System.out.print("].\n");
     }
 
-    public void printObjectArray(Object[] array) {
-        for(int i=0; i < array.length; i++) {
-            array[i] = array[i];
-            System.out.print(array[i]);
-            if (i+1 < array.length) System.out.print(", ");
-        }System.out.print("].\n");
-    }
-
-    public char[] resizeCharArray(char[] charArray, int charCount) {
+    private char[] resizeCharArray(char[] charArray, int charCount)
+    {
         boolean debug = false;
-        char[] compactArray = new char[charCount+1];
+        char[] compactArray = new char[charCount + 1];
         if (debug) System.out.println("==>> resizeCharArray charCount : " + charCount);
         if (debug) System.out.println("==>> charArray [" + charCount + "] char : " + charArray[charCount]);
 
         if (debug) System.out.print("Compacting Array : [");
-        for(int i=0; i <= charCount; i++) {
+        for (int i = 0; i <= charCount; i++) {
             compactArray[i] = charArray[i];
             if (debug) System.out.print(charArray[i]);
         }
@@ -331,45 +312,8 @@ public class ParseNations1File
         return compactArray;
     }
 
-//    public void processData(StringBuilder parsedData, List<String> lineRemaining) {
-//        System.out.println("Processing Line : [" + lineRemaining + "].");
-//        for (String word : lineRemaining) {
-//            System.out.println("processData : Adding Line : [" + word.trim() + "].");
-//            parsedData.append(word.trim());
-//        }
-//    }
-
-//    public List<String> handleHeaders(List<String> line, Set<String> headers) {
-//        System.out.println("handleHeaders : line is ["  + line + "]");
-//        List<String> lineRemaining = new ArrayList<>();
-//        List<String> headersFound = new ArrayList<>();
-//
-//        for (String header : headers) {
-//            for (String word : line) {
-//                if (word.indexOf(header) >= 0) {
-//                    System.out.println("Header found : " + word);
-//                    headersFound.add(header);
-//
-//                    String wordRemaining = getRemainingWord(header, word);
-//                    System.out.println("handleHeaders wordRemaining : [" + wordRemaining + "].");
-//                    if (wordRemaining.length() > 0) {
-//                        System.out.println("handleHeaders 1. wordRemaining.add( : " + wordRemaining + ");");
-//                        lineRemaining.add(wordRemaining);
-//                    }
-//                }
-//            }
-//        }
-//        headers.removeAll(headersFound);
-//
-//        if (headers.isEmpty())
-//            System.out.println("All Headers Found");
-//        else
-//            System.out.println("Headers left : " + headers.toString());
-//        System.out.println("handleHeaders : XXX lineRemaining [" + lineRemaining + "]");
-//        return lineRemaining;
-//    }
-
-    public String doesDatapointContainHeader(Set<String> headers, String word) {
+    private String doesDatapointContainHeader(Set<String> headers, String word)
+    {
         boolean debug = false;
         String containsHeader = "";
         for (String header : headers)
@@ -380,18 +324,16 @@ public class ParseNations1File
         return containsHeader;
     }
 
-    public StringBuilder parseCharArray(char[] charArray) {
+    private StringBuilder parseCharArray(char[] charArray)
+    {
         boolean debug = false;
         StringBuilder result = new StringBuilder();
-        if(debug) System.out.println("In parseCharArray.");
-
-        //if empty, return!
+        if (debug) System.out.println("In parseCharArray.");
         if (charArray == null) return result;
 
+        char previousChar = ' ';
         char customQuote = DEFAULT_QUOTE;
         char separator = DEFAULT_SEPARATOR;
-
-        char previousChar = ' ';
         StringBuffer curVal = new StringBuffer();
         boolean inQuotes = false;
         boolean inWord = false;
@@ -400,13 +342,15 @@ public class ParseNations1File
 
         int charCount = -1;
         if (debug) System.out.println("==>> parseCharArray.length : " + charArray.length);
-        if (debug) System.out.println("==>> Test Char [" + (charArray.length-1) + "] : " + charArray[charArray.length-1]);
+        if (debug) System.out.println(
+                "==>> Test Char [" + (charArray.length - 1) + "] : " + charArray[charArray.length - 1]);
         for (char ch : charArray) {
             charCount++;
             if (debug) {
                 if (debug) System.out.println("parseCharArray PreviousChar : " + previousChar);
-                if (debug) System.out.println("parseCharArray Current Char : [" + charArray[charCount] + "] - [+ " +
-                        + (int)charArray[charCount] + "].");
+                if (debug)
+                    System.out.println("parseCharArray Current Char : [" + charArray[charCount] + "] - [+ " +
+                            +(int) charArray[charCount] + "].");
             }
             if (inQuotes) {
                 if (debug) System.out.println("Collect Char : [" + charArray[charCount] + "].");
@@ -416,7 +360,8 @@ public class ParseNations1File
                     inQuotes = false;
                     doubleQuotesInColumn = false;
                     curVal.append(ch);
-                } else {
+                }
+                else {
                     if (debug) System.out.println("parseCharArray inQuotes: NOT_DEFAULT_QUOTE");
                     inWord = true;
                     //Fixed : allow "" in custom quote enclosed
@@ -426,24 +371,27 @@ public class ParseNations1File
                             doubleQuotesInColumn = true;
                             continue;
                         }
-                    } else {
-                        if (ch != '\n')  {
-                            if (debug) System.out.println("Hi there");
+                    }
+                    else {
+                        if (ch != '\n') {
                             curVal.append(ch);
                         }
                     }
                 }
+
                 if (ch == '\r') {
-                    if (debug) System.out.println("In LF");
                     //ignore LF characters
+                    if (debug) System.out.println("In LF");
                     continue;
-                } else if (ch == '\n') {
+                }
+                else if (ch == '\n') {
                     if (debug) System.out.println("parseCharArray inQuotes: In CF");
                     curVal.append(",");
                     if (debug) System.out.println("parseCharArray inQuotes: parseLine : " + curVal);
                     continue;
                 }
-            } else {
+            }
+            else {
                 if (ch == customQuote) {
                     inQuotes = true;
                     inWord = true;
@@ -453,9 +401,10 @@ public class ParseNations1File
                     if (startCollectChar) {
                         curVal.append('"');
                     }
-
-                } else if (ch == separator) {
-                    if (debug) System.out.println("parseCharArray : In Seperator curValue is : [" + curVal + "].");
+                }
+                else if (ch == separator) {
+                    if (debug)
+                        System.out.println("parseCharArray : In Seperator curValue is : [" + curVal + "].");
                     inWord = false;
                     result.append(curVal.toString()).append(separator);
 
@@ -465,19 +414,23 @@ public class ParseNations1File
                     if (debug) System.out.println("parseCharArray : result is now : [" + result + "].");
                     if (debug) System.out.println("parseCharArray : curValue is now : [" + curVal + "].");
 
-                } else if (ch == '\r') {
+                }
+                else if (ch == '\r') {
                     if (debug) System.out.println("In LF");
                     //ignore LF characters
                     continue;
-                } else if (ch == '\n') {
+                }
+                else if (ch == '\n') {
                     if (debug) System.out.println("parseCharArray : In CF");
                     curVal.append(",");
                     if (debug) System.out.println("parseCharArray X: parseLine : " + curVal);
                     continue;
-                } else {
+                }
+                else {
                     inWord = true;
                     curVal.append(ch);
-                    if (debug) System.out.println("Appending char [" + charCount + "] : [" + ch + "]. CurValue is [" + curVal.toString() + "].");
+                    if (debug) System.out.println(
+                            "Appending char [" + charCount + "] : [" + ch + "]. CurValue is [" + curVal.toString() + "].");
                 }
             }
             previousChar = ch;
@@ -486,7 +439,8 @@ public class ParseNations1File
         if (!inWord) {
             if (debug) System.out.println("Adding Word : " + curVal);
             result.append(curVal.toString());
-        } else {
+        }
+        else {
             result.append(curVal.toString());
             if (debug) System.out.println("Last Word is : " + curVal);
             if (debug) System.out.println("Last result is : " + result);
