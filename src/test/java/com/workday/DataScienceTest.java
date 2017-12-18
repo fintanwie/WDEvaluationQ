@@ -9,16 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 
-public class DataScienceTests
+public class DataScienceTest
 {
-    @Test
-    public void testTrue()
-    {
-        boolean result = true;
-        Assert.assertTrue("Assertion Failed", result);
-    }
-
-
     @Test
     public void testWithSampleInput() throws Exception
     {
@@ -73,7 +65,6 @@ public class DataScienceTests
         fileHeaders.add("neonat_mortal_rate");
         fileHeaders.add("region");
         fileHeaders.add("income");
-        System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations1File reader = new ParseNations1File();
         List<Map<String, String>> results = reader.readCSVFile("countryB.csv", fileHeaders);
@@ -94,7 +85,6 @@ public class DataScienceTests
         fileHeaders.add("neonat_mortal_rate");
         fileHeaders.add("region");
         fileHeaders.add("income");
-        System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations1File reader = new ParseNations1File();
         List<Map<String, String>> results = reader.readCSVFile("nations1a.csv", fileHeaders);
@@ -115,7 +105,6 @@ public class DataScienceTests
         fileHeaders.add("neonat_mortal_rate");
         fileHeaders.add("region");
         fileHeaders.add("income");
-        System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations1File reader = new ParseNations1File();
         List<Map<String, String>> results = reader.readCSVFile("nations1.csv", fileHeaders);
@@ -140,7 +129,6 @@ public class DataScienceTests
         fileHeaders.add("iso3c");
         fileHeaders.add("year");
         fileHeaders.add("gdp_percap");
-        System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations2File reader = new ParseNations2File();
         List<Map<String, String>> results = reader.readCSVFile("nations2a.csv", fileHeaders);
@@ -154,7 +142,6 @@ public class DataScienceTests
         fileHeaders.add("iso3c");
         fileHeaders.add("year");
         fileHeaders.add("gdp_percap");
-        System.out.println("fileHeaders :" + fileHeaders);
 
         ParseNations2File reader = new ParseNations2File();
         List<Map<String, String>> results = reader.readCSVFile("nations2.csv", fileHeaders);
